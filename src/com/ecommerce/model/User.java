@@ -6,11 +6,11 @@
 	    private String password;
 	    private String role;
 
-	    // Default Constructor
+	   
 	    public User() {
 	    }
 
-	    // Parameterized Constructor
+	  
 	    public User(int userId, String username, String password, String role) {
 	        this.userId = userId;
 	        this.username = username;
@@ -18,7 +18,7 @@
 	        this.role = role;
 	    }
 
-	    // Getters and Setters
+	   
 	    public int getUserId() {
 	        return userId;
 	    }
@@ -51,7 +51,7 @@
 	        this.role = role;
 	    }
 
-	    // To String Method (For Debugging)
+	  
 	    @Override
 	    public String toString() {
 	        return "User{" +
