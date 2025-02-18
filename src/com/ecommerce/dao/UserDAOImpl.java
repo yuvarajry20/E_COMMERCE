@@ -97,7 +97,6 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
-
     public void deleteUser(int userId) {
         String query = "DELETE FROM users WHERE userId = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
