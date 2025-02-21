@@ -27,6 +27,7 @@ public class UserDAOImpl implements UserDAO {
     public User getUserById(int userId) {
         String query = "SELECT * FROM users WHERE userId = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        	userId=1;
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -37,6 +38,7 @@ public class UserDAOImpl implements UserDAO {
                     rs.getString("role")
                 );
             }
+            userId++;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -106,4 +108,25 @@ public class UserDAOImpl implements UserDAO {
             e.printStackTrace();
         }
     }
+    public void registerUser(User user) {
+        String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+        try (
+             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setString(1, user.getUsername());
+            stmt.setString(2, user.getPassword());
+            stmt.setString(3, user.getRole());
+            stmt.executeUpdate();
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    user.setUserId(generatedKeys.getInt(1));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

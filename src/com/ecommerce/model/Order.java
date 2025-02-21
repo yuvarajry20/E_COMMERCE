@@ -48,4 +48,9 @@ public class Order {
     public void setStatus(String status) {
     	this.status = status;
     }
+
+	public String getUserId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

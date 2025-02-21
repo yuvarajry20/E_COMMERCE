@@ -9,4 +9,5 @@ public interface OrderDAO {
     List<Order> getOrdersByCustomer(int customerId);
     List<Order> getOrdersBySeller(int sellerId);
     void updateOrderStatus(int orderId, String status);
+	List<Order> getAllOrders();
 }

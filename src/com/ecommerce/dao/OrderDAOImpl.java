@@ -104,4 +104,11 @@ public class OrderDAOImpl implements OrderDAO {
             e.printStackTrace();
         }
     }
+
+
+	@Override
+	public List<Order> getAllOrders() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

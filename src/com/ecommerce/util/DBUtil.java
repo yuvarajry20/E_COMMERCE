@@ -14,10 +14,13 @@ public class DBUtil {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-        } catch (ClassNotFoundException | SQLException e) {
+        }
+        
+        catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Database connection initialization failed!");
         }
+ 
     }
 
     public static Connection getConnection() {
