@@ -35,4 +35,10 @@ public class OrderService {
     public void updateOrderStatus(int orderId, String status) {
         orderDAO.updateOrderStatus(orderId, status);
     }
+
+
+	public List<Order> getAllOrders() {
+		// TODO Auto-generated method stub
+		return orderDAO.getAllOrders();
+	}
 }
