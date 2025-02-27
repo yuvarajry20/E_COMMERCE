@@ -9,9 +9,11 @@ import com.ecommerce.service.OrderService;
 import com.ecommerce.dao.UserDAOImpl;
 import com.ecommerce.dao.ProductDAOImpl;
 import com.ecommerce.dao.OrderDAOImpl;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.Scanner;
-import java.util.List;
 
 public class ECommerceApp {
     private static Connection connection;
@@ -19,14 +21,14 @@ public class ECommerceApp {
     private static ProductService productService;
     private static OrderService orderService;
     private static User currentUser;
-    private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
+        Scanner scanner = null;
         try {
             connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "project_ecommerce", "1234");
             connection.setAutoCommit(false);
 
-            // Initialize DAOs and Services
+            
             UserDAOImpl userDAO = new UserDAOImpl();
             ProductDAOImpl productDAO = new ProductDAOImpl();
             OrderDAOImpl orderDAO = new OrderDAOImpl();
@@ -35,30 +37,33 @@ public class ECommerceApp {
             productService = new ProductService(productDAO);
             orderService = new OrderService(orderDAO);
 
+            File file = new File("ecommerce.txt");
+            scanner = new Scanner(file);
+
             boolean running = true;
 
             while (running) {
-                System.out.println("\n=== E-Commerce Platform ===");
+                System.out.println("\n=== E-Commerce Platform😍💕😘❤️ ===");
                 System.out.println("1. Register");
                 System.out.println("2. Login");
                 System.out.println("3. Exit");
                 System.out.print("Choose an option: ");
                 int choice = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
+                scanner.nextLine(); 
 
                 switch (choice) {
                     case 1:
-                        registerUser();
+                        registerUser(scanner);
                         break;
                     case 2:
-                        loginUser();
+                        loginUser(scanner);
                         if (currentUser != null) {
                             if (currentUser.getRole().equals("CUSTOMER")) {
-                                showCustomerMenu();
+                                showCustomerMenu(scanner);
                             } else if (currentUser.getRole().equals("SELLER")) {
-                                showSellerMenu();
+                                showSellerMenu(scanner);
                             } else if (currentUser.getRole().equals("ADMIN")) {
-                                showAdminMenu();
+                                showAdminMenu(scanner);
                             }
                         }
                         break;
@@ -70,14 +75,23 @@ public class ECommerceApp {
                         System.out.println("Invalid choice!");
                 }
             }
-            scanner.close();
-            connection.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (scanner != null) {
+                scanner.close();
+            }
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    private static void registerUser() throws SQLException {
+    private static void registerUser(Scanner scanner) throws SQLException {
         System.out.print("Enter username: ");
         String username = scanner.nextLine();
         System.out.print("Enter password: ");
@@ -99,7 +113,7 @@ public class ECommerceApp {
         }
     }
 
-    private static void loginUser() throws SQLException {
+    private static void loginUser(Scanner scanner) throws SQLException {
         System.out.print("Enter username: ");
         String username = scanner.nextLine();
         System.out.print("Enter password: ");
@@ -120,37 +134,41 @@ public class ECommerceApp {
         }
     }
 
-    private static void showCustomerMenu() throws SQLException {
+    private static void showCustomerMenu(Scanner scanner) throws SQLException {
         boolean loggedIn = true;
         while (loggedIn) {
             System.out.println("\n=== Customer Menu ===");
             System.out.println("1. Browse Products");
-            System.out.println("2. Add Product to Cart");
-            System.out.println("3. View Cart");
-            System.out.println("4. Checkout");
-            System.out.println("5. View Orders");
-            System.out.println("6. Logout");
+            System.out.println("2. Search Products");
+            System.out.println("3. Add Product to Cart");
+            System.out.println("4. View Cart");
+            System.out.println("5. Checkout");
+            System.out.println("6. View Orders");
+            System.out.println("7. Logout");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine(); 
 
             switch (choice) {
                 case 1:
                     browseProducts();
                     break;
                 case 2:
-                    addProductToCart();
+                    searchProducts(scanner);
                     break;
                 case 3:
-                    viewCart();
+                    addProductToCart(scanner);
                     break;
                 case 4:
-                    checkout();
+                    viewCart();
                     break;
                 case 5:
-                    viewOrders();
+                    checkout();
                     break;
                 case 6:
+                    viewOrders();
+                    break;
+                case 7:
                     loggedIn = false;
                     currentUser = null;
                     System.out.println("Logged out successfully!");
@@ -171,12 +189,88 @@ public class ECommerceApp {
         }
     }
 
-    private static void addProductToCart() throws SQLException {
+    private static void searchProducts(Scanner scanner) throws SQLException {
+        System.out.println("\n=== Search Products ===");
+        System.out.println("1. Search by Name");
+        System.out.println("2. Search by Category");
+        System.out.println("3. Search by Price Range");
+        System.out.print("Choose an option: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); 
+
+        switch (choice) {
+            case 1:
+                searchByName(scanner);
+                break;
+            case 2:
+                searchByCategory(scanner);
+                break;
+            case 3:
+                searchByPriceRange(scanner);
+                break;
+            default:
+                System.out.println("Invalid choice!");
+        }
+    }
+
+    private static void searchByName(Scanner scanner) throws SQLException {
+        System.out.print("Enter product name: ");
+        String name = scanner.nextLine();
+
+        String query = "SELECT * FROM products WHERE LOWER(name) LIKE LOWER(?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, "%" + name + "%");
+            ResultSet rs = pstmt.executeQuery();
+
+            System.out.println("\n=== Search Results ===");
+            while (rs.next()) {
+                System.out.println("ID: " + rs.getInt("productId") + ", Name: " + rs.getString("name") + ", Price: $" + rs.getDouble("price") + ", Stock: " + rs.getInt("stock"));
+            }
+        }
+    }
+
+    private static void searchByCategory(Scanner scanner) throws SQLException {
+        System.out.print("Enter product category: ");
+        String category = scanner.nextLine();
+
+        String query = "SELECT * FROM products WHERE LOWER(category) LIKE LOWER(?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, "%" + category + "%");
+            ResultSet rs = pstmt.executeQuery();
+
+            System.out.println("\n=== Search Results ===");
+            while (rs.next()) {
+                System.out.println("ID: " + rs.getInt("productId") + ", Name: " + rs.getString("name") + ", Price: $" + rs.getDouble("price") + ", Stock: " + rs.getInt("stock"));
+            }
+        }
+    }
+
+    private static void searchByPriceRange(Scanner scanner) throws SQLException {
+        System.out.print("Enter minimum price: ");
+        double minPrice = scanner.nextDouble();
+        System.out.print("Enter maximum price: ");
+        double maxPrice = scanner.nextDouble();
+        scanner.nextLine(); 
+
+        String query = "SELECT * FROM products WHERE price BETWEEN ? AND ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setDouble(1, minPrice);
+            pstmt.setDouble(2, maxPrice);
+            ResultSet rs = pstmt.executeQuery();
+
+            System.out.println("\n=== Search Results ===");
+            while (rs.next()) {
+                System.out.println("ID: " + rs.getInt("productId") + ", Name: " + rs.getString("name") + ", Price: $" + rs.getDouble("price") + ", Stock: " + rs.getInt("stock"));
+            }
+        }
+    }
+
+    private static void addProductToCart(Scanner scanner) throws SQLException {
         System.out.print("Enter product ID to add to cart: ");
         int productId = scanner.nextInt();
         System.out.print("Enter quantity: ");
         int quantity = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine(); 
 
         String stockQuery = "SELECT stock, price FROM products WHERE productId = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(stockQuery)) {
@@ -261,7 +355,7 @@ public class ECommerceApp {
         }
     }
 
-    private static void showSellerMenu() throws SQLException {
+    private static void showSellerMenu(Scanner scanner) throws SQLException {
         boolean loggedIn = true;
         while (loggedIn) {
             System.out.println("\n=== Seller Menu ===");
@@ -272,17 +366,17 @@ public class ECommerceApp {
             System.out.println("5. Logout");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine(); 
 
             switch (choice) {
                 case 1:
-                    addProduct();
+                    addProduct(scanner);
                     break;
                 case 2:
-                    updateProduct();
+                    updateProduct(scanner);
                     break;
                 case 3:
-                    deleteProduct();
+                    deleteProduct(scanner);
                     break;
                 case 4:
                     viewMyProducts();
@@ -298,7 +392,7 @@ public class ECommerceApp {
         }
     }
 
-    private static void addProduct() throws SQLException {
+    private static void addProduct(Scanner scanner) throws SQLException {
         System.out.print("Enter product name: ");
         String name = scanner.nextLine();
         System.out.print("Enter product description: ");
@@ -307,7 +401,7 @@ public class ECommerceApp {
         double price = scanner.nextDouble();
         System.out.print("Enter product stock: ");
         int stock = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine(); 
 
         String query = "INSERT INTO products (productId, name, description, price, stock, sellerId) VALUES (product_seq.NEXTVAL, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -325,10 +419,10 @@ public class ECommerceApp {
         }
     }
 
-    private static void updateProduct() throws SQLException {
+    private static void updateProduct(Scanner scanner) throws SQLException {
         System.out.print("Enter product ID to update: ");
         int productId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine(); 
 
         String query = "SELECT * FROM products WHERE productId = ? AND sellerId = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -345,7 +439,7 @@ public class ECommerceApp {
                 double price = scanner.nextDouble();
                 System.out.print("Enter new product stock: ");
                 int stock = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
+                scanner.nextLine(); 
 
                 String updateQuery = "UPDATE products SET name = ?, description = ?, price = ?, stock = ? WHERE productId = ?";
                 try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
@@ -367,10 +461,10 @@ public class ECommerceApp {
         }
     }
 
-    private static void deleteProduct() throws SQLException {
+    private static void deleteProduct(Scanner scanner) throws SQLException {
         System.out.print("Enter product ID to delete: ");
         int productId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine(); 
 
         String query = "DELETE FROM products WHERE productId = ? AND sellerId = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -402,7 +496,7 @@ public class ECommerceApp {
         }
     }
 
-    private static void showAdminMenu() throws SQLException {
+    private static void showAdminMenu(Scanner scanner) throws SQLException {
         boolean adminLoggedIn = true;
         while (adminLoggedIn) {
             System.out.println("\n=== Admin Menu ===");
@@ -420,7 +514,7 @@ public class ECommerceApp {
                     viewAllUsers();
                     break;
                 case 2:
-                    deleteUser();
+                    deleteUser(scanner);
                     break;
                 case 3:
                     browseProducts();
@@ -449,7 +543,7 @@ public class ECommerceApp {
         }
     }
 
-    private static void deleteUser() throws SQLException {
+    private static void deleteUser(Scanner scanner) throws SQLException {
         System.out.print("Enter user ID to delete: ");
         int userId = scanner.nextInt();
         scanner.nextLine();

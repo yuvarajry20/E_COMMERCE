@@ -27,18 +27,15 @@ public class UserDAOImpl implements UserDAO {
     public User getUserById(int userId) {
         String query = "SELECT * FROM users WHERE userId = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-        	userId=1;
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new User(
-//                    rs.getInt("userId"),
                     rs.getString("username"),
                     rs.getString("password"),
                     rs.getString("role")
                 );
             }
-            userId++;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -53,7 +50,6 @@ public class UserDAOImpl implements UserDAO {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new User(
-//                    rs.getInt("userId"),
                     rs.getString("username"),
                     rs.getString("password"),
                     rs.getString("role")
@@ -73,7 +69,6 @@ public class UserDAOImpl implements UserDAO {
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
                 users.add(new User(
-//                    rs.getInt("userId"),
                     rs.getString("username"),
                     rs.getString("password"),
                     rs.getString("role")
