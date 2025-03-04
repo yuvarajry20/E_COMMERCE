@@ -25,7 +25,7 @@ public class ECommerceApp {
     public static void main(String[] args) {
         Scanner scanner = null;
         try {
-            connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "project_ecommerce", "1234");
+            connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "ecommerce", "1234");
             connection.setAutoCommit(false);
 
             
@@ -37,13 +37,13 @@ public class ECommerceApp {
             productService = new ProductService(productDAO);
             orderService = new OrderService(orderDAO);
 
-            File file = new File("ecommerce.txt");
-            scanner = new Scanner(file);
+//            File file = new File("ecommerce.txt");
+            scanner = new Scanner(System.in);
 
             boolean running = true;
 
             while (running) {
-                System.out.println("\n=== E-Commerce Platform😍💕😘❤️ ===");
+                System.out.println("\n=== E-Commerce Platform😍💕😘❤ ===");
                 System.out.println("1. Register");
                 System.out.println("2. Login");
                 System.out.println("3. Exit");
@@ -192,8 +192,7 @@ public class ECommerceApp {
     private static void searchProducts(Scanner scanner) throws SQLException {
         System.out.println("\n=== Search Products ===");
         System.out.println("1. Search by Name");
-        System.out.println("2. Search by Category");
-        System.out.println("3. Search by Price Range");
+        System.out.println("2. Search by Price Range");
         System.out.print("Choose an option: ");
         int choice = scanner.nextInt();
         scanner.nextLine(); 
@@ -203,9 +202,6 @@ public class ECommerceApp {
                 searchByName(scanner);
                 break;
             case 2:
-                searchByCategory(scanner);
-                break;
-            case 3:
                 searchByPriceRange(scanner);
                 break;
             default:
@@ -220,22 +216,6 @@ public class ECommerceApp {
         String query = "SELECT * FROM products WHERE LOWER(name) LIKE LOWER(?)";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setString(1, "%" + name + "%");
-            ResultSet rs = pstmt.executeQuery();
-
-            System.out.println("\n=== Search Results ===");
-            while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("productId") + ", Name: " + rs.getString("name") + ", Price: $" + rs.getDouble("price") + ", Stock: " + rs.getInt("stock"));
-            }
-        }
-    }
-
-    private static void searchByCategory(Scanner scanner) throws SQLException {
-        System.out.print("Enter product category: ");
-        String category = scanner.nextLine();
-
-        String query = "SELECT * FROM products WHERE LOWER(category) LIKE LOWER(?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, "%" + category + "%");
             ResultSet rs = pstmt.executeQuery();
 
             System.out.println("\n=== Search Results ===");
@@ -445,7 +425,7 @@ public class ECommerceApp {
                 try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
                     updateStmt.setString(1, name);
                     updateStmt.setString(2, description);
-                    updateStmt.setDouble(3, price);
+                    updateStmt.setDouble(3, price); 
                     updateStmt.setInt(4, stock);
                     updateStmt.setInt(5, productId);
                     updateStmt.executeUpdate();
