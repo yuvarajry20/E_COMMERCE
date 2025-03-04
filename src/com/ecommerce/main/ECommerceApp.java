@@ -37,8 +37,8 @@ public class ECommerceApp {
             productService = new ProductService(productDAO);
             orderService = new OrderService(orderDAO);
 
-//            File file = new File("ecommerce.txt");
-            scanner = new Scanner(System.in);
+            File file = new File("ecommerce.txt");
+            scanner = new Scanner(file);
 
             boolean running = true;
 
