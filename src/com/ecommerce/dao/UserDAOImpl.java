@@ -31,7 +31,6 @@ public class UserDAOImpl implements UserDAO {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new User(
-                    rs.getInt("userId"),
                     rs.getString("username"),
                     rs.getString("password"),
                     rs.getString("role")
@@ -51,7 +50,6 @@ public class UserDAOImpl implements UserDAO {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new User(
-                    rs.getInt("userId"),
                     rs.getString("username"),
                     rs.getString("password"),
                     rs.getString("role")
@@ -71,7 +69,6 @@ public class UserDAOImpl implements UserDAO {
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
                 users.add(new User(
-                    rs.getInt("userId"),
                     rs.getString("username"),
                     rs.getString("password"),
                     rs.getString("role")
@@ -106,4 +103,25 @@ public class UserDAOImpl implements UserDAO {
             e.printStackTrace();
         }
     }
+    public void registerUser(User user) {
+        String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+        try (
+             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setString(1, user.getUsername());
+            stmt.setString(2, user.getPassword());
+            stmt.setString(3, user.getRole());
+            stmt.executeUpdate();
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    user.setUserId(generatedKeys.getInt(1));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

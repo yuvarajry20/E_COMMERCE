@@ -11,6 +11,11 @@
 	    }
 
 	  
+	    public User(String username, String password, String role) {
+	        this.username = username;
+	        this.password = password;
+	        this.role = role;
+	    }
 	    public User(int userId, String username, String password, String role) {
 	        this.userId = userId;
 	        this.username = username;
