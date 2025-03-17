@@ -37,7 +37,9 @@ public class ECommerceApp {
     public static void main(String[] args) {
     	 Scanner scanner = null;
          try {
-             scanner = new Scanner(System.in);
+        	 File file = new File("ecommerce.txt");
+
+             scanner = new Scanner(file);
 
              System.out.print("Enter database username: ");
              String dbUsername = scanner.nextLine();
